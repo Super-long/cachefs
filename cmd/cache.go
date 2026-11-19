@@ -559,9 +559,12 @@ func genConf(c *cli.Context, metaConf *meta.MetaConfig, storeConf *chunk.StoreCo
 		}
 	}
 
-	// If prefetch-workers is not set, use Prefetch workers
-	if !c.IsSet("prefetch-workers") || cfg.PrefetchWorkers == 0 {
+	if cfg.PrefetchWorkers == 0 {
 		cfg.PrefetchWorkers = cfg.Prefetch
+		if cfg.PrefetchWorkers == 0 {
+			// Preload uses this worker pool even with read-ahead disabled.
+			cfg.PrefetchWorkers = defaultPrefetchBlocks
+		}
 	}
 
 	// If we're initial source dir source, disable preload, as source dir

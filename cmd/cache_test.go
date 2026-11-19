@@ -1244,6 +1244,22 @@ func TestGenConf(t *testing.T) {
 		})
 	}
 
+	for _, tt := range []struct {
+		name    string
+		params  map[string]interface{}
+		workers uint32
+	}{
+		{"default workers", map[string]interface{}{"prefetch": 0}, 24},
+		{"zero workers", map[string]interface{}{"prefetch": 0, "prefetch-workers": 0}, 24},
+		{"explicit workers", map[string]interface{}{"prefetch": 0, "prefetch-workers": 5}, 5},
+	} {
+		t.Run("read-ahead disabled with "+tt.name, func(t *testing.T) {
+			cfg := genConf(mockCli(tt.params), mockMetaConf, mockStoreConf)
+			assert.Zero(t, cfg.Prefetch)
+			assert.Equal(t, tt.workers, cfg.PrefetchWorkers)
+		})
+	}
+
 	tests := []struct {
 		name      string
 		cliParams map[string]interface{}

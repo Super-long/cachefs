@@ -29,7 +29,10 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-const defaultSocketPath = "/var/run/cachefsd/cachefsd.sock"
+const (
+	defaultSocketPath     = "/var/run/cachefsd/cachefsd.sock"
+	defaultPrefetchBlocks = 24
+)
 
 func defaultLogDir() string {
 	var logDir = "/var/log"
@@ -391,12 +394,12 @@ func cacheFlags() []cli.Flag {
 		},
 		&cli.IntFlag{
 			Name:  "prefetch",
-			Value: 24,
+			Value: defaultPrefetchBlocks,
 			Usage: "prefetch N blocks in advance and set the block LRU window size",
 		},
 		&cli.IntFlag{
 			Name:  "prefetch-workers",
-			Usage: "number of workers to do prefetch, use the same number set by --prefetch if 0",
+			Usage: "block workers shared by prefetch and preload. 0 uses --prefetch, or its default when read-ahead is disabled",
 		},
 		&cli.StringFlag{
 			Name:  "preload",
